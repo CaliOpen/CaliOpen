@@ -7,18 +7,30 @@ import { Container } from '../components/Container';
 import { Pane } from '../components/Pane';
 import { SpacingCompact } from '../modules/ui';
 import { RootStackParamList } from '../modules/routes';
+import {
+  getSettings,
+  saveSettings,
+  resetAll,
+  SettingsPayload,
+  SETTING_KEYS,
+} from '../modules/settings';
 
 const defaultInstance = 'https://www.caliopen.app';
+function validate(settings: SettingsPayload) {
+  let isValid = true;
+
+  SETTING_KEYS.forEach((key) => {
+    if (!settings[key]?.length) {
+      isValid = false;
+    }
+  });
+
+  return {
+    isValid,
+  };
+}
 
 type Props = NativeStackScreenProps<RootStackParamList, 'settings'>;
-
-function saveSettings(
-  nextInstance: string,
-  nextLogin: string,
-  nextPass: string
-) {}
-
-function resetAll() {}
 
 export function Settings({ navigation }: Props) {
   const theme = useTheme();
@@ -28,10 +40,30 @@ export function Settings({ navigation }: Props) {
   const [loading, setLoading] = React.useState(false);
   const [loadingReset, setLoadingReset] = React.useState(false);
 
+  const { isValid } = validate({
+    instance: nextInstance,
+    login: nextLogin,
+    password: nextPass,
+  });
+
   /**
    * load settings
    */
-  const init = async () => {};
+  const init = async () => {
+    try {
+      const { instance, login, password } = await getSettings();
+
+      setInstance(instance || defaultInstance);
+      setLogin(login || '');
+      setPass(password || '');
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
+  React.useEffect(() => {
+    init();
+  }, []);
 
   const handleSave = async () => {
     if (!nextInstance || !nextLogin || !nextPass) {
@@ -39,7 +71,11 @@ export function Settings({ navigation }: Props) {
     }
     setLoading(true);
     try {
-      await saveSettings(nextInstance, nextLogin, nextPass);
+      await saveSettings({
+        instance: nextInstance,
+        login: nextLogin,
+        password: nextPass,
+      });
       setLoading(false);
       navigation.goBack();
     } catch (e) {
@@ -92,6 +128,7 @@ export function Settings({ navigation }: Props) {
           mode="contained"
           loading={loading}
           style={styles.settingItem}
+          disabled={!isValid}
         >
           Save
         </Button>

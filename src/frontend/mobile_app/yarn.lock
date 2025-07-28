@@ -3559,6 +3559,7 @@ __metadata:
     "@react-navigation/native-stack": ^6.9.12
     "@types/react": ~18.0.27
     expo: ~48.0.18
+    expo-secure-store: ~12.1.1
     expo-status-bar: ~1.4.4
     react: 18.2.0
     react-native: 0.71.8
@@ -4605,6 +4606,15 @@ __metadata:
     compare-versions: ^3.4.0
     invariant: ^2.2.4
   checksum: e3f69a62ef3c8dd357e7e3c90d0009d0dd0cfeae93d86c5043580bd78d35c0be5fcd345bd9dfa7b6e58d0a945b823cb6cb8666ad00c86a06bb31fe409eaed7d5
+  languageName: node
+  linkType: hard
+
+"expo-secure-store@npm:~12.1.1":
+  version: 12.1.1
+  resolution: "expo-secure-store@npm:12.1.1"
+  peerDependencies:
+    expo: "*"
+  checksum: 02ee829686dcbfe69cdd2c14f2dd0d60b36509c20c928e1ae7c837b62401c2c070ceb5ca03bbb14b35644dd7cb7f18564f583346229a1fb92d33880f191cff9f
   languageName: node
   linkType: hard
 
