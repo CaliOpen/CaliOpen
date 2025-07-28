@@ -3,10 +3,7 @@ import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
-import {
-  createNativeStackNavigator,
-  NativeStackNavigationProp,
-} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home, HomeHeader } from './screens/Home';
 import { Settings } from './screens/Settings';
 import { theme } from './modules/ui';

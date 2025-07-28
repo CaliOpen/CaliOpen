@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Container } from '../components/Container';
@@ -7,6 +7,8 @@ import { LinkButton } from '../components/LinkButton';
 import { Pane } from '../components/Pane';
 import { getBearer } from '../modules/settings';
 import { fetchUser } from '../modules/api';
+import { Sync } from '../modules/sync/components/Sync';
+import { BottomAppBar } from '../components/BottomAppBar';
 
 const useAppInitialized = () => {
   const [appInitialized, setAppInitialized] = React.useState(true);
@@ -56,23 +58,20 @@ export function Home() {
         </Container>
         {syncLoading && <Text>Loading…</Text>}
       </Pane>
-      {!appInitialized && (
-        <Container>
-          <LinkButton mode="contained" to="settings">
-            Configure
-          </LinkButton>
-        </Container>
-      )}
-      {appInitialized && (
-        <View
-          style={{
-            ...StyleSheet.absoluteFillObject,
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Text>WIP</Text>
-        </View>
-      )}
+      <BottomAppBar>
+        {!appInitialized && (
+          <Container>
+            <LinkButton mode="contained" to="settings">
+              Configure
+            </LinkButton>
+          </Container>
+        )}
+        {appInitialized && (
+          <Container>
+            <Sync />
+          </Container>
+        )}
+      </BottomAppBar>
     </>
   );
 }

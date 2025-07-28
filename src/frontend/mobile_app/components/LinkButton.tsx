@@ -1,4 +1,4 @@
-import { useLinkProps, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import * as React from 'react';
 import { Button, type ButtonProps } from 'react-native-paper';
 
