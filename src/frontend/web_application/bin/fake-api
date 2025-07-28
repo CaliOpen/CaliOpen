@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+const http = require('http');
+
+console.log('start server');
+
+const server = http.createServer((req, res) => {
+  console.log('req', req.headers, req.method, req.url, req.body);
+  req.setEncoding('utf8');
+  req.on('readable', () => {
+    console.log('reaceived', req.read());
+  });
+  res.end();
+});
+
+server.listen(31415);

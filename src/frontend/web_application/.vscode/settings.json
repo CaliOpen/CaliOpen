@@ -1,0 +1,9 @@
+{
+  "eslint.packageManager": "yarn",
+  "eslint.alwaysShowStatus": true,
+  "i18n-ally.localesPaths": [
+    "locale",
+    "src/modules/i18n",
+    "locale/_build/src/modules/i18n"
+  ]
+}

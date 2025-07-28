@@ -1,0 +1,17 @@
+version: '2'
+services:
+  # Caliopen APIv2
+  proxy-api:
+    build:
+      context: ./api-mock
+    image: caliopen_api_mock
+    expose:
+      - "31415"
+
+  # Caliopen frontend
+  frontend:
+    image: public-registry.caliopen.org/caliopen_frontend:develop
+    links:
+      - proxy-api:api.dev.caliopen.org
+    ports:
+      - "127.0.0.1:4000:4000"

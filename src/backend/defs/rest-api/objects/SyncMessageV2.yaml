@@ -1,0 +1,46 @@
+---
+type: object
+properties:
+  attachments:
+    type: array
+    items:
+      "$ref": Attachment.yaml
+  body:
+    type: string
+  discussion_id:
+    type: string
+  user_identities: # to which user's local identities the message is linked to
+    type: array
+    items:
+      type: string
+  message_id:
+    type: string
+  parent_id: # The id of the Message this message is a reply to. This is primarily for drafts, but the server may support this for received messages as well by looking up the [@!RFC5322] Message-Id referenced in the In-Reply-To header and searching for this message in the user’s mail.
+    type: string
+  participants:
+    type: array
+    items:
+      "$ref": Participant.yaml
+  subject:
+    type: string
+  privacy_features:
+    type: object
+    "$ref": PrivacyFeatures.yaml
+  date:
+    type: string
+    format: date-time
+  is_answered:
+    type: boolean
+  is_draft:
+    type: boolean
+  is_unread:
+    type: boolean
+  is_received:
+    type: boolean
+required:
+  - user_identities
+  - body
+  - message_id
+  - participants
+  - date
+additionalProperties: false

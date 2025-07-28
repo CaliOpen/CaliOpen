@@ -1,0 +1,6050 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.2.0",
+    "title": "Caliopen HTTP/REST API"
+  },
+  "host": "localhost:31415",
+  "basePath": "/api",
+  "schemes": [
+    "http"
+  ],
+  "paths": {
+    "/v1/authentications": {
+      "post": {
+        "description": "Returns an auth token to build basicAuth for the provided credentials",
+        "tags": [
+          "users"
+        ],
+        "security": [],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "authentication",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Authentication"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful authentication",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string",
+                  "description": "the user_id makes the 'username' for basicAuth"
+                },
+                "tokens": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string",
+                      "description": "the access_token makes the 'password' for basicAuth"
+                    },
+                    "expires_in": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "expires_at": {
+                      "type": "string"
+                    },
+                    "refresh_token": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "device": {
+                  "type": "object",
+                  "properties": {
+                    "device_id": {
+                      "type": "string",
+                      "description": "Identifier of the device used for authentication"
+                    },
+                    "status": {
+                      "type": "string",
+                      "description": "Device status"
+                    }
+                  }
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "401": {
+            "description": "Authentication error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "description": "Gets `user + contact` objects for current logged-in user",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-PI",
+            "in": "header",
+            "required": true,
+            "description": "The PI range requested in form of `1;100`",
+            "type": "string",
+            "default": "1;100"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with json object",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/v1/users": {
+      "post": {
+        "description": "Create a new User with provided credentials",
+        "tags": [
+          "users"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "user",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewUser"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "User creation completed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve new user's infos at /users/{user_id}"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "406": {
+            "description": "NotAcceptable. Server refuses to fulfill the request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/users/{user_id}": {
+      "patch": {
+        "description": "Partially implemented. Currently only for changing password.",
+        "tags": [
+          "users",
+          "password"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "attachments": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/Attachment"
+                      }
+                    },
+                    "body": {
+                      "type": "string"
+                    },
+                    "body_is_plain": {
+                      "type": "boolean"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "date_delete": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "date_insert": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "date_sort": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "discussion_id": {
+                      "type": "string"
+                    },
+                    "external_references": {
+                      "type": "object",
+                      "$ref": "#/definitions/ExternalReferences"
+                    },
+                    "excerpt": {
+                      "type": "string"
+                    },
+                    "user_identities": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "importance_level": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "is_answered": {
+                      "type": "boolean"
+                    },
+                    "is_draft": {
+                      "type": "boolean"
+                    },
+                    "is_unread": {
+                      "type": "boolean"
+                    },
+                    "is_received": {
+                      "type": "boolean"
+                    },
+                    "message_id": {
+                      "type": "string"
+                    },
+                    "parent_id": {
+                      "type": "string"
+                    },
+                    "participants": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/Participant"
+                      }
+                    },
+                    "privacy_features": {
+                      "type": "object",
+                      "$ref": "#/definitions/PrivacyFeatures"
+                    },
+                    "pi": {
+                      "type": "object",
+                      "$ref": "#/definitions/PI"
+                    },
+                    "pi_message": {
+                      "type": "object",
+                      "$ref": "#/definitions/PIMessage"
+                    },
+                    "raw_msg_id": {
+                      "type": "string"
+                    },
+                    "subject": {
+                      "type": "string"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "protocol": {
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "attachments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Attachment"
+                  }
+                },
+                "body": {
+                  "type": "string"
+                },
+                "body_is_plain": {
+                  "type": "boolean"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_delete": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_insert": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_sort": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "discussion_id": {
+                  "type": "string"
+                },
+                "external_references": {
+                  "type": "object",
+                  "$ref": "#/definitions/ExternalReferences"
+                },
+                "excerpt": {
+                  "type": "string"
+                },
+                "user_identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "importance_level": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "is_answered": {
+                  "type": "boolean"
+                },
+                "is_draft": {
+                  "type": "boolean"
+                },
+                "is_unread": {
+                  "type": "boolean"
+                },
+                "is_received": {
+                  "type": "boolean"
+                },
+                "message_id": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string"
+                },
+                "participants": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Participant"
+                  }
+                },
+                "privacy_features": {
+                  "type": "object",
+                  "$ref": "#/definitions/PrivacyFeatures"
+                },
+                "pi": {
+                  "type": "object",
+                  "$ref": "#/definitions/PI"
+                },
+                "pi_message": {
+                  "type": "object",
+                  "$ref": "#/definitions/PIMessage"
+                },
+                "raw_msg_id": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "protocol": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/users/{user_id}/actions": {
+      "post": {
+        "description": "send an order to execute one (or many) action(s) regarding the user : reset_password, etc. A successful execution of the action will probably modify one or more user's attribute(s) ## NOT YET IMPLEMENTED ##",
+        "tags": [
+          "users",
+          "password"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "actions",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Actions"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "action(s) successfully executed. Nothing returned.",
+            "schema": {
+              "$ref": "#/definitions/MessageV2"
+            }
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden action. Server is refusing to execute the given action(s) to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but action was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "execution of action failed.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/username/isAvailable": {
+      "get": {
+        "description": "Check if an username is available for creation within Caliopen instance",
+        "tags": [
+          "users",
+          "username"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "availability state for requested username",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "available": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "username",
+                "available"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "400": {
+            "description": "malform request (probably missing 'username' query param)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": {
+                  "type": "string"
+                },
+                "available": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "username",
+                "available"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "/v1/settings": {
+      "get": {
+        "description": "Returns settings belonging to current user",
+        "tags": [
+          "settings"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Settings returned",
+            "schema": {
+              "$ref": "#/definitions/Settings"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "Update settings with rfc5789 and rfc7396 specifications",
+        "tags": [
+          "settings"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/Settings.yaml#/properties"
+                  }
+                },
+                "default_locale": {
+                  "type": "string",
+                  "default": "fr-FR"
+                },
+                "message_display_format": {
+                  "type": "string",
+                  "default": "rich_text"
+                },
+                "contact_display_order": {
+                  "type": "string",
+                  "default": "given_name"
+                },
+                "contact_display_format": {
+                  "type": "string",
+                  "default": "family_name, given_name"
+                },
+                "notification_enabled": {
+                  "type": "boolean",
+                  "default": true
+                },
+                "notification_message_preview": {
+                  "type": "string",
+                  "default": "always"
+                },
+                "notification_sound_enabled": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "notification_delay_disappear": {
+                  "type": "integer",
+                  "default": 10
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/identities/locals": {
+      "get": {
+        "description": "returns the list of user's local identities",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Local identities returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of local identities found for user"
+                },
+                "local_identities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/UserIdentity"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/identities/remotes": {
+      "get": {
+        "description": "returns the list of user's remote identities, or filtered if query param",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "pending",
+            "in": "query",
+            "type": "string",
+            "required": false
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Remote identities returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of remote identities found for user"
+                },
+                "remote_identities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/UserIdentity"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "create a new remote identity for user",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "identity",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewUserIdentity"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Remote identity created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve new remote identity's at identities/remotes/{identifier}"
+                },
+                "identifier": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/identities/remotes/{identifier}": {
+      "get": {
+        "description": "returns a remote identity belonging to user",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Remote identity returned",
+            "schema": {
+              "$ref": "#/definitions/UserIdentity"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Remote identity not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a remote identity belonging to user",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Remote identity deleted"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update a remote identity with rfc5789 and rfc7396 specifications",
+        "tags": [
+          "identities"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/UserIdentity.yaml#/properties"
+                  }
+                },
+                "credentials": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "display_name": {
+                  "type": "string"
+                },
+                "identity_id": {
+                  "type": "string"
+                },
+                "identifier": {
+                  "type": "string"
+                },
+                "infos": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "last_check": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "protocol": {
+                  "type": "string",
+                  "enum": [
+                    "email",
+                    "twitter"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "active",
+                    "inactive",
+                    "deleted"
+                  ]
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "local",
+                    "remote"
+                  ]
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "identity not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/passwords/reset": {
+      "post": {
+        "description": "Route to receive a \"reset password\" request from an anonymous user.",
+        "tags": [
+          "passwords"
+        ],
+        "security": [],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "reset_request",
+            "in": "body",
+            "required": true,
+            "description": "data the user has typed into the reset form",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "recovery_email": {
+                  "type": "string"
+                },
+                "username": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Request successfully handled. No body is returned."
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "user not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "Parameters were valid but the server was unable to handle the request.",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/passwords/reset/{token}": {
+      "get": {
+        "description": "Returns an auth token to build basicAuth, if the token in path is valid",
+        "tags": [
+          "passwords"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Route is valid. No body is returned."
+          },
+          "404": {
+            "description": "Token not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "User posts a new password",
+        "tags": [
+          "passwords"
+        ],
+        "security": [],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "new_password",
+            "in": "body",
+            "required": true,
+            "description": "A simple json with the new password as a string",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "password": {
+                  "type": "string"
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "password"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Password update successful. No body is returned."
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "Parameters were valid but the server was unable to change the password.",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/providers": {
+      "get": {
+        "description": "returns list of supported external providers for remote identities creation",
+        "tags": [
+          "identities",
+          "providers"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of supported providers",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "providers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/providers/{provider_name}": {
+      "get": {
+        "description": "returns provider's properties, notably the url to call for initiating Oauth process",
+        "tags": [
+          "identities",
+          "providers"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "provider_name",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "identifier",
+            "in": "query",
+            "type": "string",
+            "required": false
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "providers infos",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "oauth_request_url": {
+                  "type": "string"
+                },
+                "protocol": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/providers/{provider_name}/callback": {
+      "get": {
+        "description": "url registered at provider to which its API will redirect user after user authentication",
+        "tags": [
+          "identities",
+          "providers"
+        ],
+        "security": [],
+        "parameters": [
+          {
+            "name": "provider_name",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "a simple message for user to inform Oauth process completion",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/test/oauth": {
+      "get": {
+        "description": "serves an index to test Oauth processes",
+        "tags": [
+          "providers"
+        ],
+        "security": [],
+        "parameters": [],
+        "produces": [
+          "text/html"
+        ],
+        "responses": {
+          "200": {
+            "description": "index to trigger oauth popup"
+          }
+        }
+      }
+    },
+    "/v2/contacts": {
+      "get": {
+        "description": "Returns contacts list for current user according to given params",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-PI",
+            "in": "header",
+            "required": true,
+            "description": "The PI range requested in form of `1;100`",
+            "type": "string",
+            "default": "1;100"
+          },
+          {
+            "name": "X-Caliopen-IL",
+            "in": "header",
+            "required": true,
+            "description": "The Importance Level range requested in form of `-10;10`",
+            "type": "string",
+            "default": "-10;10"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "number of contacts to return per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "number of pages to skip from the response"
+          },
+          {
+            "name": "uri",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "return contact that has this uri embedded, if any"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Contacts list",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of contacts found for current user for the given parameters"
+                },
+                "contacts": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Contact"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new contact for the logged-in user",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "contact",
+            "in": "body",
+            "description": "the contact to create",
+            "schema": {
+              "$ref": "#/definitions/NewContact"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve new contact's infos at /contacts/{contact_id}"
+                },
+                "contact_id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/contacts/{contact_id}": {
+      "get": {
+        "description": "Returns a contact",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact found",
+            "schema": {
+              "$ref": "#/definitions/Contact"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a contact",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Contact deleted"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update a contact with rfc5789 and rfc7396 specifications",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/Contact.yaml#/properties"
+                  }
+                },
+                "additional_name": {
+                  "type": "string"
+                },
+                "addresses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PostalAddress"
+                  }
+                },
+                "avatar": {
+                  "type": "string"
+                },
+                "contact_id": {
+                  "type": "string"
+                },
+                "date_insert": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_update": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "deleted": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "emails": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Email"
+                  }
+                },
+                "family_name": {
+                  "type": "string"
+                },
+                "given_name": {
+                  "type": "string"
+                },
+                "groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SocialIdentity"
+                  }
+                },
+                "ims": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/IM"
+                  }
+                },
+                "infos": {
+                  "type": "object"
+                },
+                "name_prefix": {
+                  "type": "string"
+                },
+                "name_suffix": {
+                  "type": "string"
+                },
+                "organizations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Organization"
+                  }
+                },
+                "phones": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Phone"
+                  }
+                },
+                "pi": {
+                  "type": "object",
+                  "$ref": "#/definitions/PI"
+                },
+                "privacy_features": {
+                  "type": "object",
+                  "$ref": "#/definitions/PrivacyFeatures"
+                },
+                "public_keys": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicKey"
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "title": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/contacts/{contact_id}/identities": {
+      "get": {
+        "description": "returns a list of contact's identities",
+        "tags": [
+          "contacts"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact's identities returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of identities found for the contact"
+                },
+                "contact_identities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/ContactIdentity"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update tags list for contact",
+        "tags": [
+          "contacts",
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/Contact.yaml#/properties"
+                  }
+                },
+                "additional_name": {
+                  "type": "string"
+                },
+                "addresses": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PostalAddress"
+                  }
+                },
+                "avatar": {
+                  "type": "string"
+                },
+                "contact_id": {
+                  "type": "string"
+                },
+                "date_insert": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_update": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "deleted": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "emails": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Email"
+                  }
+                },
+                "family_name": {
+                  "type": "string"
+                },
+                "given_name": {
+                  "type": "string"
+                },
+                "groups": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "identities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/SocialIdentity"
+                  }
+                },
+                "ims": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/IM"
+                  }
+                },
+                "infos": {
+                  "type": "object"
+                },
+                "name_prefix": {
+                  "type": "string"
+                },
+                "name_suffix": {
+                  "type": "string"
+                },
+                "organizations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Organization"
+                  }
+                },
+                "phones": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Phone"
+                  }
+                },
+                "pi": {
+                  "type": "object",
+                  "$ref": "#/definitions/PI"
+                },
+                "privacy_features": {
+                  "type": "object",
+                  "$ref": "#/definitions/PrivacyFeatures"
+                },
+                "public_keys": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicKey"
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "title": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Contact's tags updated. Empty body."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden, server is refusing to apply payload to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but payload was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "server failed to execute the request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/contacts/{contact_id}/publickeys": {
+      "post": {
+        "description": "Add a pgp public key to a contact",
+        "tags": [
+          "pgp",
+          "keys"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "key",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewPublicKey"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Public key created",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve public key /contacts/{contact_id}/publickeys/{publickey_id}"
+                },
+                "publickey_id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity. Parameters were valid but the server was unable to create the key (probably because of a semantically erroneous document)",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "get": {
+        "description": "Returns all publickeys linked to contact",
+        "tags": [
+          "pgp",
+          "keys"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of public keys",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of keys found"
+                },
+                "pubkeys": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicKey"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/contacts/{contact_id}/publickeys/{pubkey_id}": {
+      "get": {
+        "description": "Retrieve publickey",
+        "tags": [
+          "keys",
+          "pgp"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pubkey_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with json object",
+            "schema": {
+              "$ref": "#/definitions/PublicKey"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update a public key",
+        "tags": [
+          "keys",
+          "pgp"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pubkey_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. Property _label_ is the only one patchable.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "current_state",
+                "label"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "public key not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "json is valid but patch conflicts with db's current state",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a public key",
+        "tags": [
+          "keys",
+          "pgp"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pubkey_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deletion"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/contacts/{contact_id}/tags": {
+      "patch": {
+        "description": "update tags list for contact",
+        "tags": [
+          "contacts",
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "tags",
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Contact's tags updated. Empty body."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden, server is refusing to apply payload to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "contact not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but payload was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "server failed to execute the request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/imports": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "formData",
+            "description": "the vcard file to upload",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Import successful"
+          },
+          "400": {
+            "description": "Syntax error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "File valid but we can create the new contact",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/discussions": {
+      "get": {
+        "description": "Returns the list of discussions for current user according to given filter",
+        "tags": [
+          "discussions"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-PI",
+            "in": "header",
+            "required": true,
+            "description": "The PI range requested in form of `0;100`",
+            "type": "string",
+            "default": "0;100"
+          },
+          {
+            "name": "X-Caliopen-IL",
+            "in": "header",
+            "required": true,
+            "description": "The Importance Level range requested in form of `-10;10`",
+            "type": "string",
+            "default": "-10;10"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "number of discussions to return per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "number of discussions to skip for pagination"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Discussions returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of discussions found for current user for the given parameters"
+                },
+                "discussions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Discussion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/discussions/{discussion_id}": {
+      "get": {
+        "description": "Returns metadata of a discussion",
+        "tags": [
+          "discussions"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "discussion_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Discussion found",
+            "schema": {
+              "$ref": "#/definitions/Discussion"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Discussion not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages": {
+      "post": {
+        "description": "Create a new Message (draft) for an user",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "message",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewMessageV2"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Draft creation completed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve draft at /messages/{message_id}"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity. Parameters were valid but the server was unable to create the draft (probably because of a semantically erroneous document, like an empty draft)",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/messages": {
+      "get": {
+        "description": "Returns the list of messages for current user according to given parameters/filter",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-PI",
+            "in": "header",
+            "required": true,
+            "description": "The PI range requested in form of `0;100`",
+            "type": "string",
+            "default": "0;100"
+          },
+          {
+            "name": "X-Caliopen-IL",
+            "in": "header",
+            "required": true,
+            "description": "The Importance Level range requested in form of `-10;10`",
+            "type": "string",
+            "default": "-10;10"
+          },
+          {
+            "name": "discussion_id",
+            "in": "query",
+            "description": "filter messages belonging to a specific discussion",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "number of messages to return per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "number of pages to skip from the response"
+          },
+          {
+            "name": "msg_id",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "if provided with range[] param, specify a message_id around which messages will be fetched"
+          },
+          {
+            "name": "range[]",
+            "in": "query",
+            "type": "string",
+            "required": false,
+            "description": "boundaries param if message_id param is provided [before, after]"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Messages returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of messages found for user for the given parameters"
+                },
+                "messages": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/MessageV2"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/{message_id}": {
+      "patch": {
+        "description": "update a draft with rfc5789 and rfc7396 specifications",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/MessageV2.yaml#/properties"
+                  }
+                },
+                "attachments": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Attachment"
+                  }
+                },
+                "body": {
+                  "type": "string"
+                },
+                "body_is_plain": {
+                  "type": "boolean"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_delete": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_insert": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "date_sort": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "discussion_id": {
+                  "type": "string"
+                },
+                "external_references": {
+                  "type": "object",
+                  "$ref": "#/definitions/ExternalReferences"
+                },
+                "excerpt": {
+                  "type": "string"
+                },
+                "user_identities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "importance_level": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "is_answered": {
+                  "type": "boolean"
+                },
+                "is_draft": {
+                  "type": "boolean"
+                },
+                "is_unread": {
+                  "type": "boolean"
+                },
+                "is_received": {
+                  "type": "boolean"
+                },
+                "message_id": {
+                  "type": "string"
+                },
+                "parent_id": {
+                  "type": "string"
+                },
+                "participants": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Participant"
+                  }
+                },
+                "privacy_features": {
+                  "type": "object",
+                  "$ref": "#/definitions/PrivacyFeatures"
+                },
+                "pi": {
+                  "type": "object",
+                  "$ref": "#/definitions/PI"
+                },
+                "pi_message": {
+                  "type": "object",
+                  "$ref": "#/definitions/PIMessage"
+                },
+                "raw_msg_id": {
+                  "type": "string"
+                },
+                "subject": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "protocol": {
+                  "type": "string"
+                },
+                "user_id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a message belonging to an user",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deletion. No body is returned"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden action. Server is refusing to delete this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/messages/{message_id}": {
+      "get": {
+        "description": "returns a message",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Message found",
+            "schema": {
+              "$ref": "#/definitions/MessageV2"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/messages/{message_id}/tags": {
+      "patch": {
+        "description": "update tags list for message",
+        "tags": [
+          "messages",
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "required": [
+                "tags",
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "message's tags updated. Empty body."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden, server is refusing to apply payload to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but payload was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "server failed to execute the request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/messages/{message_id}/actions": {
+      "post": {
+        "description": "send an order to execute one (or many) action(s) for the given message : send, etc. A successful execution of the action will probably modify one or more message's attribute(s)",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "actions",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Actions"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "action(s) successfully executed. Message is sent back with its modified attributes (if any)",
+            "schema": {
+              "$ref": "#/definitions/MessageV2"
+            }
+          },
+          "204": {
+            "description": "action(s) successfully executed. Nothing returned.",
+            "schema": {
+              "$ref": "#/definitions/MessageV2"
+            }
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden action. Server is refusing to execute the given action(s) to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but action was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "execution of action failed.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/messages/{message_id}/attachments": {
+      "post": {
+        "description": "(for draft only) upload a file to server and add attachment reference to the draft.",
+        "tags": [
+          "attachments",
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attachment",
+            "in": "formData",
+            "description": "the attachment file to upload",
+            "type": "file",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "File uploaded sucessfully. Backend sends back attachment's temp_id.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "temp_id": {
+                  "type": "string",
+                  "description": "attachment's temporary id. temp_id exists as long as message has 'draft' status."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "413": {
+            "description": "Request entity too large"
+          },
+          "415": {
+            "description": "Unsupported media type"
+          }
+        }
+      }
+    },
+    "/v2/messages/{message_id}/attachments/{attachment_id}": {
+      "get": {
+        "description": "Download file from server",
+        "tags": [
+          "messages",
+          "attachments"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attachment_id",
+            "description": "attachment position within message",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [],
+        "responses": {
+          "200": {
+            "description": "the attachment, in the 'content-transfer-encoding' format of the part.",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "400": {
+            "description": "bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "message or attachment not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "(for drafts only) delete temporary file and remove attachment reference from the draft.",
+        "tags": [
+          "messages",
+          "attachments"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "message_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attachment_id",
+            "description": "attachment's temporary id.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deletion. No body is returned"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden action. Server is refusing to delete this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "message or attachment not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/batch/messages": {
+      "post": {
+        "description": "Sync messages",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "message",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/SyncMessageV2"
+              }
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Synchronization completed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/raws/{raw_msg_id}": {
+      "get": {
+        "description": "Returns a raw message",
+        "tags": [
+          "messages"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "raw_msg_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "text/plain"
+        ],
+        "responses": {
+          "200": {
+            "description": "the raw message",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "/v2/tags": {
+      "get": {
+        "description": "Returns tags visible to current user according to given parameters",
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Tags returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of tags found for user for the given parameters"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Tag"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create a new Tag for an user",
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewTag"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "User tag creation completed",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "location": {
+                  "type": "string",
+                  "description": "url to retrieve new tag's infos at /tags/{name}"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity. Parameters were valid but the server was unable to create the tag (probably because of a semantically erroneous document, like an empty tag)",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/tags/{tag_id}": {
+      "get": {
+        "description": "Retrieve tag infos",
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response with json object",
+            "schema": {
+              "$ref": "#/definitions/Tag"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update a tag",
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "importance_level": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "label": {
+                      "type": "string"
+                    },
+                    "importance_level": {
+                      "type": "integer",
+                      "format": "int32"
+                    }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "additionalProperties": false,
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "tag not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "409": {
+            "description": "json is valid but patch conflicts with db's current state",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a tag belonging to an user",
+        "tags": [
+          "tags"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful deletion"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/devices": {
+      "get": {
+        "description": "Returns devices belonging to current user according to given parameters",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-PI",
+            "in": "header",
+            "required": true,
+            "description": "The PI range requested in form of `1;100`",
+            "type": "string",
+            "default": "1;100"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "number of devices to return per page"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "number of pages to skip from the response"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Devices returned",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "number of devices found for current user for the given parameters"
+                },
+                "devices": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Device"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/devices/{device_id}": {
+      "get": {
+        "description": "Returns a device",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Device found",
+            "schema": {
+              "$ref": "#/definitions/Device"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a device",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Device deleted"
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "patch": {
+        "description": "update a device with rfc5789 and rfc7396 specifications",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "patch",
+            "in": "body",
+            "required": true,
+            "description": "the patch to apply. See 'Caliopen Patch RFC' within /doc directory.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "current_state": {
+                  "type": "object",
+                  "properties": {
+                    "$ref": "../objects/Device.yaml#/properties"
+                  }
+                },
+                "device_id": {
+                  "type": "string"
+                },
+                "ip_creation": {
+                  "description": "ip address at creation",
+                  "type": "string"
+                },
+                "locations": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/DeviceLocation"
+                  }
+                },
+                "name": {
+                  "type": "string"
+                },
+                "public_keys": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicKey"
+                  }
+                },
+                "status": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "default": "unknow",
+                  "enum": [
+                    "other",
+                    "desktop",
+                    "laptop",
+                    "smartphone",
+                    "tablet"
+                  ]
+                },
+                "user_agent": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "current_state"
+              ]
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Update successful. No body is returned."
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden patch. Server is refusing to apply the given patch's properties to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "device not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "patch was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/devices/{device_id}/actions": {
+      "post": {
+        "description": "Route to receive orders to trigger actions on a device",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "device_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "actions",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Actions"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "action(s) successfully executed. Nothing returned.",
+            "schema": {
+              "$ref": "#/definitions/MessageV2"
+            }
+          },
+          "400": {
+            "description": "json payload malformed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "403": {
+            "description": "Forbidden action. Server is refusing to execute the given action(s) to this ressource",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Device not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "422": {
+            "description": "json is valid but action was semantically malformed or unprocessable",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "424": {
+            "description": "execution of action failed.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/validate-device/{token}": {
+      "get": {
+        "description": "complete device validation if token is valid",
+        "tags": [
+          "devices"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "Route is valid. No body is returned."
+          },
+          "404": {
+            "description": "Token not found or invalid",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/participants/suggest": {
+      "get": {
+        "description": "Returns a list of suggestions according to given parameters/filter. Search is performed within current user's indexes (messages & contacts).",
+        "tags": [
+          "participants",
+          "suggest"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "context",
+            "in": "query",
+            "description": "current user's context (to optimize suggest relevance)",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "msg_compose"
+            ]
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "description": "a string (3 chars at least) from which to perform the suggestion search",
+            "required": true,
+            "type": "string",
+            "minLength": 3
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "a list of suggestions for user to pick-up an identity",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ParticipantSuggest"
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/participants/discussion": {
+      "post": {
+        "description": "Returns discussion related to a list of participants",
+        "tags": [
+          "participants"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "consumes": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "participants",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Participant"
+              }
+            },
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Computed discussion information",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "hash": {
+                  "type": "string",
+                  "description": "participants informations hash for discussion lookup"
+                },
+                "discussion_id": {
+                  "type": "string",
+                  "description": "id of existing discussion for given participants"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/search": {
+      "get": {
+        "description": "Simple API to execute full-text searches within user's indexes. A more complexe API will be available with a POST verb.",
+        "tags": [
+          "messages",
+          "contacts",
+          "search"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "X-Caliopen-IL",
+            "in": "header",
+            "required": true,
+            "description": "The Importance Level range requested in form of `-10;10`",
+            "type": "string",
+            "default": "-10;10"
+          },
+          {
+            "name": "term",
+            "in": "query",
+            "description": "the search string",
+            "required": true,
+            "type": "string",
+            "minLength": 3
+          },
+          {
+            "name": "field",
+            "in": "query",
+            "description": "name of a field on which to perform the search. If omitted defaults to « _all ».",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "doctype",
+            "in": "query",
+            "description": "type of documents to narrow the search to.",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "message",
+              "contact",
+              ""
+            ]
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "number of documents to return per page, but only if param «type» is present."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "type": "integer",
+            "required": false,
+            "description": "number of pages to skip from the response, but only if param «type» is present."
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "an object holding an array of documents found. Docs are assembled by type.",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "total number of documents found"
+                },
+                "message_hits": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "total number of messages found"
+                    },
+                    "messages": {
+                      "type": "array",
+                      "description": "at most 5 documents are returned if query param « type » is not specified.",
+                      "items": {
+                        "$ref": "#/definitions/SearchResponse"
+                      }
+                    }
+                  }
+                },
+                "contact_hits": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "total number of contacts found"
+                    },
+                    "contacts": {
+                      "type": "array",
+                      "description": "at most 5 documents are returned if query param « type » is not specified.",
+                      "items": {
+                        "$ref": "#/definitions/SearchResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Not yet implemented. Future route for more complexe searches.",
+        "tags": [
+          "contacts",
+          "messages",
+          "search"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "responses": {
+          "501": {
+            "description": "route not implemented.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/notifications": {
+      "get": {
+        "description": "Returns pending notifications",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "description": "oldest timestamp or uuid to retrieve (older notifications will not be fetched). RFC3339 format if time, UUIDv1 if id.",
+            "type": "string"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "description": "earlest timestamp or uuid to retrieve (earler notifications will not be fetched). RFC3339 format if time, UUIDv1 if id.",
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "json document with an array of pending notifications",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "total": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "notifications": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Notification"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete pending notifications by time range",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "description": "delete all notifications with a timestamp before `until` time (RFC3339 format)",
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "deletions executed, no body returned."
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v2/notifications/{notification_id}": {
+      "get": {
+        "description": "Returns a notification",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification found",
+            "schema": {
+              "$ref": "#/definitions/Notification"
+            }
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Message not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "description": "Delete a notification",
+        "tags": [
+          "notifications"
+        ],
+        "security": [
+          {
+            "basicAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "notification_id",
+            "in": "path",
+            "type": "string",
+            "required": true
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "204": {
+            "description": "deletion executed, no body returned."
+          },
+          "400": {
+            "description": "malform request",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized access",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "ECKey": {
+      "type": "object",
+      "properties": {
+        "curve": {
+          "type": "string",
+          "enum": [
+            "P-256",
+            "P-384",
+            "P-512"
+          ]
+        },
+        "hash": {
+          "type": "string",
+          "enum": [
+            "SHA256",
+            "SHA384",
+            "SHA512"
+          ]
+        },
+        "x": {
+          "type": "string"
+        },
+        "y": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "curve",
+        "x",
+        "y"
+      ],
+      "additionalProperties": false
+    },
+    "DefaultDevice": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string"
+        },
+        "ecdsa_key": {
+          "type": "object",
+          "$ref": "#/definitions/ECKey"
+        }
+      },
+      "required": [
+        "device_id",
+        "ecdsa_key"
+      ],
+      "additionalProperties": false
+    },
+    "Authentication": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "context": {
+          "type": "string"
+        },
+        "device": {
+          "$ref": "#/definitions/DefaultDevice"
+        }
+      },
+      "required": [
+        "username",
+        "password"
+      ],
+      "additionalProperties": false
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            },
+            "code": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "PostalAddress": {
+      "type": "object",
+      "properties": {
+        "address_id": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "street": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "city"
+      ],
+      "additionalProperties": false
+    },
+    "Email": {
+      "type": "object",
+      "properties": {
+        "email_id": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "SocialIdentity": {
+      "type": "object",
+      "properties": {
+        "social_id": {
+          "type": "string"
+        },
+        "infos": {
+          "type": "object"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "IM": {
+      "type": "object",
+      "properties": {
+        "im_id": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "Organization": {
+      "type": "object",
+      "properties": {
+        "deleted": {
+          "type": "boolean"
+        },
+        "organization_id": {
+          "type": "string"
+        },
+        "department": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "job_description": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false
+    },
+    "Phone": {
+      "type": "object",
+      "properties": {
+        "phone_id": {
+          "type": "string"
+        },
+        "normalized_number": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "number": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "number"
+      ],
+      "additionalProperties": false
+    },
+    "PI": {
+      "type": "object",
+      "properties": {
+        "technic": {
+          "type": "integer"
+        },
+        "context": {
+          "type": "integer"
+        },
+        "comportment": {
+          "type": "integer"
+        },
+        "version": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": true
+    },
+    "PrivacyFeatures": {
+      "type": "object",
+      "properties": {}
+    },
+    "PublicKey": {
+      "type": "object",
+      "properties": {
+        "alg": {
+          "type": "string"
+        },
+        "crv": {
+          "type": "string"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_update": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "expire_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "fingerprint": {
+          "type": "string"
+        },
+        "kty": {
+          "type": "string"
+        },
+        "key_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "resource_id": {
+          "type": "string"
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "use": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "x": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "y": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "key": {
+          "type": "string",
+          "description": "DER or PEM key, base64 encoded"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label",
+        "key_id",
+        "resource_id",
+        "user_id"
+      ],
+      "additionalProperties": false
+    },
+    "Contact": {
+      "type": "object",
+      "properties": {
+        "additional_name": {
+          "type": "string"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PostalAddress"
+          }
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "contact_id": {
+          "type": "string"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_update": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "deleted": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Email"
+          }
+        },
+        "family_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SocialIdentity"
+          }
+        },
+        "ims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/IM"
+          }
+        },
+        "infos": {
+          "type": "object"
+        },
+        "name_prefix": {
+          "type": "string"
+        },
+        "name_suffix": {
+          "type": "string"
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Organization"
+          }
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Phone"
+          }
+        },
+        "pi": {
+          "type": "object",
+          "$ref": "#/definitions/PI"
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        },
+        "public_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublicKey"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "title": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contact_id",
+        "user_id"
+      ],
+      "additionalProperties": false
+    },
+    "User": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/Contact"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "family_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "params": {
+          "type": "object"
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        },
+        "pi": {
+          "type": "object",
+          "$ref": "#/definitions/PI"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "recovery_email": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NewEmail": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "is_primary": {
+          "type": "boolean"
+        },
+        "label": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "NewContact": {
+      "type": "object",
+      "properties": {
+        "additional_name": {
+          "type": "string"
+        },
+        "addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PostalAddress"
+          }
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "emails": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NewEmail"
+          }
+        },
+        "family_name": {
+          "type": "string"
+        },
+        "given_name": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "groups": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SocialIdentity"
+          }
+        },
+        "ims": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "infos": {
+          "type": "object"
+        },
+        "name_prefix": {
+          "type": "string"
+        },
+        "name_suffix": {
+          "type": "string"
+        },
+        "organizations": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "phones": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Phone"
+          }
+        },
+        "public_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublicKey"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "Settings": {
+      "type": "object",
+      "properties": {
+        "default_locale": {
+          "type": "string",
+          "default": "fr-FR"
+        },
+        "message_display_format": {
+          "type": "string",
+          "default": "rich_text"
+        },
+        "contact_display_order": {
+          "type": "string",
+          "default": "given_name"
+        },
+        "contact_display_format": {
+          "type": "string",
+          "default": "family_name, given_name"
+        },
+        "notification_enabled": {
+          "type": "boolean",
+          "default": true
+        },
+        "notification_message_preview": {
+          "type": "string",
+          "default": "always"
+        },
+        "notification_sound_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "notification_delay_disappear": {
+          "type": "integer",
+          "default": 10
+        }
+      }
+    },
+    "NewUser": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "$ref": "#/definitions/NewContact"
+        },
+        "username": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        },
+        "recovery_email": {
+          "type": "string"
+        },
+        "tos": {
+          "type": "boolean"
+        },
+        "privacy": {
+          "type": "boolean"
+        },
+        "settings": {
+          "$ref": "#/definitions/Settings"
+        },
+        "device": {
+          "$ref": "#/definitions/DefaultDevice"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "username",
+        "password",
+        "recovery_email"
+      ]
+    },
+    "Attachment": {
+      "type": "object",
+      "properties": {
+        "content_type": {
+          "type": "string"
+        },
+        "is_inline": {
+          "type": "boolean"
+        },
+        "file_name": {
+          "type": "string"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "temp_id": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "mime_boundary": {
+          "type": "string"
+        }
+      }
+    },
+    "ExternalReferences": {
+      "type": "object",
+      "properties": {
+        "ancestors_id": {
+          "type": "string"
+        },
+        "message_id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Participant": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "contact_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "label": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "To",
+            "Cc",
+            "Bcc",
+            "From",
+            "Reply-To",
+            "Sender"
+          ]
+        }
+      },
+      "required": [
+        "address",
+        "type",
+        "protocol"
+      ],
+      "additionalProperties": false
+    },
+    "PIMessage": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "integer"
+        },
+        "transport": {
+          "type": "integer"
+        },
+        "social": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false
+    },
+    "Actions": {
+      "type": "object",
+      "properties": {
+        "actions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "send",
+              "set_read",
+              "set_unread",
+              "reset_password",
+              "delete",
+              "device-validation"
+            ]
+          }
+        },
+        "params": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "actions"
+      ]
+    },
+    "MessageV2": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attachment"
+          }
+        },
+        "body": {
+          "type": "string"
+        },
+        "body_is_plain": {
+          "type": "boolean"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_delete": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_sort": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "discussion_id": {
+          "type": "string"
+        },
+        "external_references": {
+          "type": "object",
+          "$ref": "#/definitions/ExternalReferences"
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "user_identities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "importance_level": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "is_answered": {
+          "type": "boolean"
+        },
+        "is_draft": {
+          "type": "boolean"
+        },
+        "is_unread": {
+          "type": "boolean"
+        },
+        "is_received": {
+          "type": "boolean"
+        },
+        "message_id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        },
+        "pi": {
+          "type": "object",
+          "$ref": "#/definitions/PI"
+        },
+        "pi_message": {
+          "type": "object",
+          "$ref": "#/definitions/PIMessage"
+        },
+        "raw_msg_id": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "UserIdentity": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "identity_id": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "infos": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "last_check": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "email",
+            "twitter"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "inactive",
+            "deleted"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "local",
+            "remote"
+          ]
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NewUserIdentity": {
+      "type": "object",
+      "properties": {
+        "credentials": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "identifier": {
+          "type": "string"
+        },
+        "infos": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "protocol": {
+          "type": "string",
+          "enum": [
+            "email",
+            "twitter"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "active",
+            "inactive",
+            "deleted"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "local",
+            "remote"
+          ]
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "identifier",
+        "protocol"
+      ],
+      "additionalProperties": false
+    },
+    "ContactIdentity": {
+      "type": "object",
+      "properties": {
+        "identifier": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "privacy_index": {
+          "type": "object",
+          "$ref": "#/definitions/PI"
+        },
+        "protocol": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NewPublicKey": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "DER or PEM key, base64 encoded"
+        },
+        "label": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "key",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "Discussion": {
+      "type": "object",
+      "properties": {
+        "attachment_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_update": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "discussion_id": {
+          "type": "string"
+        },
+        "importance_level": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "excerpt": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "string"
+        },
+        "protocol": {
+          "type": "string"
+        },
+        "total_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "unread_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "last_message_id": {
+          "type": "string"
+        },
+        "last_message_date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "last_message_subject": {
+          "type": "string"
+        }
+      }
+    },
+    "NewMessageV2": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attachment"
+          }
+        },
+        "body": {
+          "type": "string"
+        },
+        "discussion_id": {
+          "type": "string"
+        },
+        "user_identities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message_id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        }
+      },
+      "required": [
+        "user_identities"
+      ],
+      "additionalProperties": false
+    },
+    "SyncMessageV2": {
+      "type": "object",
+      "properties": {
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Attachment"
+          }
+        },
+        "body": {
+          "type": "string"
+        },
+        "discussion_id": {
+          "type": "string"
+        },
+        "user_identities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message_id": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Participant"
+          }
+        },
+        "subject": {
+          "type": "string"
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "is_answered": {
+          "type": "boolean"
+        },
+        "is_draft": {
+          "type": "boolean"
+        },
+        "is_unread": {
+          "type": "boolean"
+        },
+        "is_received": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "user_identities",
+        "body",
+        "message_id",
+        "participants",
+        "date"
+      ],
+      "additionalProperties": false
+    },
+    "Tag": {
+      "type": "object",
+      "properties": {
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "user",
+            "system"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "importance_level": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "additionalProperties": false
+    },
+    "NewTag": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "importance_level": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "DeviceLocation": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "device_id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "default": "other",
+          "enum": [
+            "other",
+            "home",
+            "work",
+            "public"
+          ]
+        },
+        "user_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "address"
+      ],
+      "additionalProperties": false
+    },
+    "Device": {
+      "type": "object",
+      "properties": {
+        "device_id": {
+          "type": "string"
+        },
+        "date_insert": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "date_revoked": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ip_creation": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "privacy_features": {
+          "type": "object",
+          "$ref": "#/definitions/PrivacyFeatures"
+        },
+        "pi": {
+          "type": "object",
+          "$ref": "#/definitions/PI"
+        },
+        "status": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "user_agent": {
+          "type": "string"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DeviceLocation"
+          }
+        },
+        "public_keys": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublicKey"
+          }
+        }
+      },
+      "required": [
+        "device_id",
+        "user_id",
+        "name",
+        "type",
+        "status",
+        "date_insert"
+      ],
+      "additionalProperties": false
+    },
+    "ParticipantSuggest": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "could be empty if suggestion is a contact (or should we automatically put preferred identity's address ?)"
+        },
+        "contact_id": {
+          "type": "string",
+          "description": "contact's ID if any"
+        },
+        "label": {
+          "type": "string",
+          "description": "name of contact or <display-name> in case of an address returned from participants lookup, if any"
+        },
+        "protocol": {
+          "type": "string",
+          "description": "email, IRC…"
+        },
+        "source": {
+          "type": "string",
+          "description": "'participant' or 'contact', ie from where this suggestion came from"
+        }
+      }
+    },
+    "SearchResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "id of document (shortcut to fetch full doc from db if needed)."
+        },
+        "score": {
+          "type": "number",
+          "format": "float",
+          "description": "how confident is our index for this document to match the request. Higher is better. Documents are sorted on this field by default."
+        },
+        "highlights": {
+          "type": "object",
+          "description": "Field names where terms of request where found. Each key maps to an array of excerpts."
+        },
+        "document": {
+          "type": "object",
+          "description": "full document returned from index."
+        }
+      }
+    },
+    "Notification": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
+        },
+        "emitter": {
+          "type": "string"
+        },
+        "notif_id": {
+          "description": "notif_id is UUIDv1, including a timestamp",
+          "type": "string"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "string"
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "type": "string"
+              },
+              "emitter": {
+                "type": "string"
+              },
+              "notif_id": {
+                "description": "notif_id is UUIDv1, including a timestamp",
+                "type": "string"
+              },
+              "reference": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "securityDefinitions": {
+    "basicAuth": {
+      "type": "basic",
+      "description": "HTTP Basic Authentication. `Password` is the `access_token` return by /authentications and `Username` is the `user_id` returned by /authentications"
+    }
+  }
+}

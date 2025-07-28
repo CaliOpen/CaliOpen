@@ -1,0 +1,29 @@
+#!/usr/bin/env node
+
+const winston = require('winston');
+const { Syslog } = require('winston-syslog');
+
+const logger = winston.createLogger({
+  levels: winston.config.syslog.levels,
+  format: winston.format.simple(),
+  transports: [
+    new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.timestamp(),
+        winston.format.label({ label: 'test-logger' }),
+        winston.format.align(),
+        winston.format.printf(info => `${info.timestamp} ${info.level} ${info.label} - ${info.message}`),
+      ),
+    }),
+    new Syslog({
+      facility: 'user',
+      // type: '5424',
+      protocol: 'unix',
+      path: '/dev/log',
+    }),
+  ],
+});
+
+logger.info('t1 - dey');
+logger.error('t2 - dey');
