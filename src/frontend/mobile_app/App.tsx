@@ -1,13 +1,65 @@
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import {
+  Appbar,
+  DefaultTheme,
+  Provider as PaperProvider,
+  FAB,
+  IconButton,
+} from 'react-native-paper';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+const Blue600 = '#0F98C6';
+const Blue900 = '#005680';
+
+const Green300 = '#13BA95';
+const Green600 = '#008D61';
+
+const Gray600 = '#444444';
+const Gray200 = '#EFEFEF';
+
+const Error = '#4BBC07';
+const Surface = '#BBE8FD';
+const Background = '#1D1D1D';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: Blue600,
+    onPrimary: Gray200,
+    secondary: Green300,
+    onSecondary: Gray200,
+  },
+};
+
+const Stack = createNativeStackNavigator();
+
+// TODO
+const HomeScreen = () => <Text>Home</Text>;
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>hello</Text>
-      <StatusBar style="auto" />
-    </View>
+    <PaperProvider theme={theme}>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="home"
+          screenOptions={{
+            headerMode: 'screen',
+            title: 'Caliopen',
+            headerTintColor: theme.colors.onPrimary,
+            headerStyle: {
+              backgroundColor: theme.colors.primary,
+            },
+          }}
+        >
+          <Stack.Screen name="home" component={HomeScreen} />
+        </Stack.Navigator>
+        <StatusBar style="auto" />
+      </NavigationContainer>
+    </PaperProvider>
   );
 }
 
