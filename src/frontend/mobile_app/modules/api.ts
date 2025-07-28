@@ -52,3 +52,43 @@ export const login = async ({
 
   return response;
 };
+
+export const doSync = async () => {
+  const settings = await getSettings({ full: true });
+
+  if (!settings) {
+    throw new AppError('Settings are not set');
+  }
+  const fetchConfig = {
+    url: `${settings.instance}/api/v2/batch/messages`,
+    method: 'POST',
+    data: {
+      messages: [
+        {
+          user_identities: [],
+          body: 'Test sync 1',
+          message_id: '1',
+          participants: [],
+          date: 0,
+        },
+      ],
+    },
+  };
+  const signatureHeaders = await getSignatureHeaders(
+    fetchConfig,
+    deviceManager
+  );
+
+  const bearer = (await getBearer()) || '';
+
+  return fetch(fetchConfig.url, {
+    method: fetchConfig.method,
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${bearer}`,
+      ...signatureHeaders,
+    },
+    body: JSON.stringify(fetchConfig.data),
+  });
+};

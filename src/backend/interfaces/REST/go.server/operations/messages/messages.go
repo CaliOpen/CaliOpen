@@ -16,6 +16,7 @@ import (
 	"github.com/satori/go.uuid"
 	"net/http"
 	"strconv"
+	"encoding/json"
 )
 
 // GET …/messages
@@ -153,4 +154,16 @@ func GetMessage(ctx *gin.Context) {
 	} else {
 		ctx.Data(http.StatusOK, "application/json; charset=utf-8", msg_json)
 	}
+}
+
+// POST /batch/messages
+func PostBatch(ctx *gin.Context) {
+	// user_id := ctx.MustGet("user_id").(string)
+	// shard_id := ctx.MustGet("shard_id").(string)
+	// user_info := &UserInfo{User_id: user_id, Shard_id: shard_id}
+
+	data := map[string]string{"message": "OK"}
+	msg_json, _ := json.Marshal(data)
+
+	ctx.Data(http.StatusOK, "application/json; charset=utf-8", msg_json)
 }

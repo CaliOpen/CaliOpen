@@ -15,7 +15,16 @@ services:
       - apiv2
       - apiv1
     ports:
-      - "31415:31415"
+      - '31415:31415'
+    volumes:
+      - ./conf/proxy-api.conf:/etc/nginx/nginx.conf
+  proxyapi_dev_apiv2:
+    image: nginx
+    depends_on:
+      - apiv2_dev
+      - apiv1
+    ports:
+      - '31415:31415'
     volumes:
       - ./conf/proxy-api.conf:/etc/nginx/nginx.conf
   # Caliopen APIv2
@@ -32,9 +41,26 @@ services:
       - nats
       - objectstore
     ports:
-      - "6544:6544"
+      - '6544:6544'
     volumes:
       - ../src/backend/configs:/etc/caliopen
+  apiv2_dev:
+    build:
+      context: ../src/backend
+      dockerfile: Dockerfile.go-api
+    image: caliopen_apiv2_dev
+    ## this very bad config for a public machine
+    depends_on:
+      - redis
+      - cassandra
+      - elasticsearch
+      - nats
+      - objectstore
+    ports:
+      - '6544:6544'
+    volumes:
+      - ../src/backend/configs:/etc/caliopen
+      - ../src/backend:/go/src/github.com/CaliOpen/Caliopen/src/backend
   # Caliopen APIv1
   apiv1:
     build:
@@ -46,8 +72,9 @@ services:
       - cassandra
       - elasticsearch
     ports:
-      - "6543:6543"
+      - '6543:6543'
     volumes:
+      # woops this overide swagger.json
       - ../src/backend/configs:/etc/caliopen
 
   # ### Redis Database
@@ -56,7 +83,7 @@ services:
   redis:
     image: redis
     ports:
-        - "6379:6379"
+      - '6379:6379'
 
   # ### Cassandra
   #
@@ -64,9 +91,9 @@ services:
   cassandra:
     image: scylladb/scylla:3.2.5
     ports:
-      - "9042:9042"
-      - "9160:9160"
-      - "7000:7000"
+      - '9042:9042'
+      - '9160:9160'
+      - '7000:7000'
     volumes:
       - db:/var/lib/scylla
     entrypoint:
@@ -74,7 +101,7 @@ services:
       - --memory
       - 512M
       - --smp
-      - "1"
+      - '1'
 
   # ### Elasticsearch
   #
@@ -82,11 +109,11 @@ services:
   elasticsearch:
     image: elasticsearch:5-alpine
     ports:
-      - "9200:9200"
+      - '9200:9200'
     environment:
       - xpack.security.enabled=false
       - xpack.monitoring.enabled=false
-      - "ES_JAVA_OPTS=-Xms512M -Xmx512M"
+      - 'ES_JAVA_OPTS=-Xms512M -Xmx512M'
     volumes:
       - index:/usr/share/elasticsearch/data
 
@@ -106,18 +133,18 @@ services:
       - ../src/backend/configs:/etc/caliopen
 
     # Caliopen cli tool
-#  climl:
-#    build:
-#      context: ../src/backend
-#      dockerfile: Dockerfile.cli-ml
-#    image: caliopen_climl
-#    depends_on:
-#      - cassandra
-#      - elasticsearch
-#      - objectstore
-#    volumes:
-#      - .:/srv/caliopen/src/backend/devtools
-#      - ../src/backend/configs:/etc/caliopen
+  #  climl:
+  #    build:
+  #      context: ../src/backend
+  #      dockerfile: Dockerfile.cli-ml
+  #    image: caliopen_climl
+  #    depends_on:
+  #      - cassandra
+  #      - elasticsearch
+  #      - objectstore
+  #    volumes:
+  #      - .:/srv/caliopen/src/backend/devtools
+  #      - ../src/backend/configs:/etc/caliopen
 
   # Caliopen frontend
   frontend:
@@ -125,7 +152,7 @@ services:
       context: ../src/frontend/web_application
     image: caliopen_frontend
     ports:
-      - "4000:4000"
+      - '4000:4000'
     depends_on:
       - proxyapi
     environment:
@@ -137,7 +164,7 @@ services:
       dockerfile: Dockerfile.dev
     image: caliopen_frontend_dev
     ports:
-      - "4000:4000"
+      - '4000:4000'
     depends_on:
       - proxyapi
     environment:
@@ -156,7 +183,7 @@ services:
       - smtp
       - imapworker
     ports:
-      - "2525:2525"
+      - '2525:2525'
     volumes:
       - ../src/backend/configs:/etc/caliopen
 
@@ -164,8 +191,8 @@ services:
   nats:
     image: nats:1.4.0
     ports:
-      - "4222:4222"
-      - "8222:8222"
+      - '4222:4222'
+      - '8222:8222'
 
   # NATS Message Handler
   mqworker:
@@ -185,12 +212,11 @@ services:
   objectstore:
     image: minio/minio:latest
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ../src/backend/configs/minio:/etc/caliopen/minio
       - store:/export
-    command:
-      server --address :9090 -C /etc/caliopen/minio /export
+    command: server --address :9090 -C /etc/caliopen/minio /export
     environment:
       - MINIO_ACCESS_KEY=CALIOPEN_ACCESS_KEY_
       - MINIO_SECRET_KEY=CALIOPEN_SECRET_KEY_BE_GOOD_AND_LIVE_OLD
@@ -215,12 +241,12 @@ services:
       dockerfile: Dockerfile.twitter-worker
     image: caliopen_twitterworker
     depends_on:
-    - cassandra
-    - objectstore
-    - elasticsearch
-    - nats
+      - cassandra
+      - objectstore
+      - elasticsearch
+      - nats
     volumes:
-    - ../src/backend/configs:/etc/caliopen
+      - ../src/backend/configs:/etc/caliopen
 
   mastodonworker:
     build:
@@ -228,12 +254,12 @@ services:
       dockerfile: Dockerfile.mastodon-worker
     image: caliopen_mastodonworker
     depends_on:
-    - cassandra
-    - objectstore
-    - elasticsearch
-    - nats
+      - cassandra
+      - objectstore
+      - elasticsearch
+      - nats
     volumes:
-    - ../src/backend/configs:/etc/caliopen
+      - ../src/backend/configs:/etc/caliopen
 
   # Poller for remote identities
   identitypoller:
@@ -255,13 +281,13 @@ services:
   smtp:
     image: inbucket/inbucket
     ports:
-      - "8888:9000"
-      - "2500:2500"
-      - "1100:1100"
+      - '8888:9000'
+      - '2500:2500'
+      - '1100:1100'
 
   kibana:
     image: kibana:5
     ports:
-      - "5601:5601"
+      - '5601:5601'
     depends_on:
       - elasticsearch

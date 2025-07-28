@@ -10,8 +10,9 @@ export const useEvents = (): [Events, PushEvent] => {
     (ev: React.ReactNode) => {
       setEvents(([...prev]) => {
         prev.push(ev);
-        if (prev.length > 20) {
-          prev.slice(20 - prev.length);
+        if (prev.length > 10) {
+          // prev.slice(20 - prev.length);
+          prev = [];
         }
 
         return prev;

@@ -32,7 +32,7 @@ const useAppInitialized = () => {
 
 export function Home() {
   const navigation = useNavigation();
-  const appInitialized = useAppInitialized();
+  const appInitialized = useAppInitialized() || true;
   const [events, pushEvent] = useEvents();
 
   const testAuth = async () => {

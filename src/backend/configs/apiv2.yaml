@@ -41,7 +41,7 @@ ApiConfig:
     keys_topic: keyAction             # topic's name to post messages regarding public key events
     users_topic: userAction           # topic's name to post messages regarding users events
     idpoller_topic: idCache           # topic's name to post messages to idpoller regarding identities management
-  swaggerSpec: ./swagger.json #absolute path or relative path to go.server bin
+  swaggerSpec: ./swagger-go.json #absolute path or relative path to go.server bin
   RedisConfig:
     host: redis:6379
     password: ""        #no password set
@@ -71,4 +71,3 @@ ProxyConfig:
   routes:
     - /api/v2/: localhost:6544
     - /: apiv1:3001         # route "/" catch all other requests
-

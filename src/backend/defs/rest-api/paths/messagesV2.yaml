@@ -325,3 +325,40 @@ messages_{message_id}_tags:
         description: server failed to execute the request
         schema:
           "$ref": "../objects/Error.yaml"
+batch:
+  post:
+    description: Sync messages
+    tags:
+      - messages
+    security:
+      - basicAuth: []
+    consumes:
+      - application/json
+    parameters:
+    - name: message
+      in: body
+      required: true
+      schema:
+        type: array
+        items:
+          type: object
+          "$ref": "../objects/SyncMessageV2.yaml"
+    produces:
+      - application/json
+    responses:
+      '200':
+        description: Synchronization completed
+        schema:
+          type: object
+          properties:
+            message:
+              type: string
+      '400':
+        description: malform request
+        schema:
+          type: object
+          "$ref": "../objects/Error.yaml"
+      '401':
+        description: Unauthorized access
+        schema:
+          "$ref": "../objects/Error.yaml"

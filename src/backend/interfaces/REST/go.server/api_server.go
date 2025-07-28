@@ -304,4 +304,8 @@ func (server *REST_API) AddHandlers(api *gin.RouterGroup) {
 	prov.GET("/:provider_name", http_middleware.BasicAuthFromCache(caliopen.Facilities.Cache, "caliopen"), providers.GetProvider)
 	prov.GET("/:provider_name/callback", providers.CallbackHandler)
 	api.StaticFile("/test/oauth", "../interfaces/REST/go.server/operations/providers/oauth-test.html")
+
+	/** batchs **/
+	batch := api.Group("/batch", http_middleware.BasicAuthFromCache(caliopen.Facilities.Cache, "caliopen"))
+	batch.POST("/messages", messages.PostBatch)
 }

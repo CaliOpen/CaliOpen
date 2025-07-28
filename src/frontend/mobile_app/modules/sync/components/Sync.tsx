@@ -3,6 +3,7 @@ import { Button } from 'react-native-paper';
 import SmsAndroid from 'react-native-get-sms-android';
 import { PermissionsAndroid, Text } from 'react-native';
 import { getLastSync, setLastSync } from '../../settings';
+import { doSync } from '../../api';
 
 /* List SMS messages matching the filter */
 var filter = {
@@ -58,54 +59,77 @@ const formatDate = (time: null | number) => {
   return new Date(time).toLocaleDateString();
 };
 
+function sync(lastSync: null | number, indexFrom: number = 0) {}
+
 interface Props {
   pushEvent: (el: React.ReactNode) => void;
 }
 export function Sync({ pushEvent }: Props) {
+  // const handlePress = async () => {
+  //   const lastSync = await getLastSync();
+  //   pushEvent(<Text key={`${new Date().getTime()}_start`}>Start sync</Text>);
+
+  //   // check permissions
+  //   const granted = await PermissionsAndroid.request(
+  //     PermissionsAndroid.PERMISSIONS.READ_SMS,
+  //     {
+  //       title: 'Allow access to SMS',
+  //       message: 'Allow SMS access for syncing',
+  //       buttonPositive: 'OK',
+  //       buttonNegative: 'Never',
+  //       buttonNeutral: 'Ask me later',
+  //     }
+  //   );
+
+  //   if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+  //     return;
+  //   }
+
+  //   // TODO: pagin
+  //   const smsList: { count: number; sms: Array<SMS> } = await new Promise(
+  //     (resolve, reject) =>
+  //       SmsAndroid.list(
+  //         JSON.stringify({
+  //           ...filter,
+  //           // minDate: lastSync
+  //         }),
+  //         reject,
+  //         (count: number, sms: string) =>
+  //           resolve({ count, sms: JSON.parse(sms) })
+  //       )
+  //   );
+
+  //   // TODO: sync with instance
+  //   console.log(
+  //     smsList.count,
+  //     smsList.sms.length,
+  //     smsList.sms.map(({ _id, body }) => ({ _id, body }))
+  //   );
+
+  //   const lastSynced = smsList.sms[smsList.sms.length - 1];
+  //   pushEvent(
+  //     <Text key={`${new Date().getTime()}_count`}>{smsList.count} synced</Text>
+  //   );
+  //   pushEvent(
+  //     <Text key={`${new Date().getTime()}_end`}>
+  //       From {formatDate(lastSync) || 'the beginnig'} to{' '}
+  //       {formatDate(lastSynced.date)}
+  //     </Text>
+  //   );
+  //   setLastSync(lastSynced.date);
+  // };
+
   const handlePress = async () => {
-    const lastSync = await getLastSync();
-    pushEvent(<Text key={`${new Date().getTime()}_start`}>Start sync</Text>);
-
-    // check permissions
-    const granted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.READ_SMS,
-      {
-        title: 'Allow access to SMS',
-        message: 'Allow SMS access for syncing',
-        buttonPositive: 'OK',
-        buttonNegative: 'Never',
-        buttonNeutral: 'Ask me later',
-      }
-    );
-
-    if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      return;
+    console.log('start');
+    try {
+      const res = await doSync();
+      console.log('res');
+      console.log(res.status, await res.json());
+    } catch (err) {
+      console.error('err', err);
+    } finally {
+      console.log('end');
     }
-
-    // TODO: pagin
-    const smsList: { count: number; sms: Array<SMS> } = await new Promise(
-      (resolve, reject) =>
-        SmsAndroid.list(
-          JSON.stringify({ ...filter, minDate: lastSync }),
-          reject,
-          (count: number, sms: string) =>
-            resolve({ count, sms: JSON.parse(sms) })
-        )
-    );
-
-    // TODO: sync with instance
-
-    const lastSynced = smsList.sms[smsList.sms.length - 1];
-    pushEvent(
-      <Text key={`${new Date().getTime()}_count`}>{smsList.count} synced</Text>
-    );
-    pushEvent(
-      <Text key={`${new Date().getTime()}_end`}>
-        From {formatDate(lastSync) || 'the beginnig'} to{' '}
-        {formatDate(lastSynced.date)}
-      </Text>
-    );
-    setLastSync(lastSynced.date);
   };
   return (
     <Button mode="contained" onPress={handlePress}>

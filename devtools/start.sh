@@ -64,11 +64,19 @@ set -e
 docker-compose run cli -h
 docker-compose up -d objectstore
 # sleep 60
-docker-compose up -d proxyapi lmtpd identitypoller
+# docker-compose up -d lmtpd identitypoller
 
 if [ "$DEV_APP" = "frontend" ]; then
-  echo "start frontend in dev mode"
-  docker-compose up frontend_dev
+    docker-compose up -d proxyapi
+    echo "start frontend in dev mode"
+    docker-compose up frontend_dev
+elif [ "$DEV_APP" = "apiv2" ]; then
+    echo "start apiv2 in dev mode"
+    docker-compose build apiv2_dev
+    docker-compose up -d apiv2_dev
+    docker-compose up -d proxyapi_dev_apiv2
+    echo "restart apiv2_dev to apply changes"
 else
+    docker-compose up -d proxyapi
     docker-compose up -d frontend
 fi
