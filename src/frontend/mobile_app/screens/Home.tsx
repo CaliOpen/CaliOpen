@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Container } from '../components/Container';
 import { LinkButton } from '../components/LinkButton';
+import { Pane } from '../components/Pane';
 
 // WIP
 interface Settings {
@@ -34,10 +35,12 @@ export function Home() {
 
   return (
     <>
-      <View style={styles.container}>
-        <Text>This app only retrieves your SMS then sync with Caliopen.</Text>
+      <Pane>
+        <Container>
+          <Text>Retrieves SMS then sync with Caliopen</Text>
+        </Container>
         {syncLoading && <Text>Loading…</Text>}
-      </View>
+      </Pane>
       {!appInitialized && (
         <Container>
           <LinkButton mode="contained" to="/settings">
@@ -58,12 +61,3 @@ export function Home() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
