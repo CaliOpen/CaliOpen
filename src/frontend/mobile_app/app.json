@@ -14,13 +14,17 @@
     "assetBundlePatterns": ["**/*"],
     "jsEngine": "hermes",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "org.caliopen.mobileApp"
     },
+    "platforms": ["android"],
     "android": {
+      "package": "org.caliopen.mobileApp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": ["android.permission.READ_SMS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
