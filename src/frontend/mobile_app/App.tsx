@@ -1,15 +1,10 @@
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import {
-  Appbar,
-  DefaultTheme,
-  Provider as PaperProvider,
-  FAB,
-  IconButton,
-} from 'react-native-paper';
+import { StyleSheet } from 'react-native';
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Home } from './screens/Home';
 
 const Blue600 = '#0F98C6';
 const Blue900 = '#005680';
@@ -37,9 +32,6 @@ const theme = {
 
 const Stack = createNativeStackNavigator();
 
-// TODO
-const HomeScreen = () => <Text>Home</Text>;
-
 export default function App() {
   return (
     <PaperProvider theme={theme}>
@@ -55,7 +47,7 @@ export default function App() {
             },
           }}
         >
-          <Stack.Screen name="home" component={HomeScreen} />
+          <Stack.Screen name="home" component={Home} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
