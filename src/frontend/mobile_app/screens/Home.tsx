@@ -35,9 +35,9 @@ export function Home() {
 
   return (
     <>
-      <Pane>
+      <Pane centered>
         <Container>
-          <Text>Retrieves SMS then sync with Caliopen</Text>
+          <Text>Sync your SMS with Caliopen</Text>
         </Container>
         {syncLoading && <Text>Loading…</Text>}
       </Pane>

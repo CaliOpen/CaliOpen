@@ -9,9 +9,9 @@ const Green600 = '#008D61';
 const Gray600 = '#444444';
 const Gray200 = '#EFEFEF';
 
-const Error = '#4BBC07';
+const Error = '#9d3535';
 const Surface = '#BBE8FD';
-const Background = '#1D1D1D';
+const SurfaceVariant = '#fff';
 
 export const theme = {
   ...DefaultTheme,
@@ -21,6 +21,8 @@ export const theme = {
     onPrimary: Gray200,
     secondary: Green300,
     onSecondary: Gray200,
+    surface: Surface,
+    surfaceVariant: SurfaceVariant,
   },
 };
 
