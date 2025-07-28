@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Appbar, useTheme } from 'react-native-paper';
+import { Appbar } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Container } from '../components/Container';
 import { LinkButton } from '../components/LinkButton';
 import { Pane } from '../components/Pane';
 import { getBearer } from '../modules/settings';
 import { fetchUser } from '../modules/api';
-import { SCREEN_SETTINGS } from './consts';
 
 const useAppInitialized = () => {
   const [appInitialized, setAppInitialized] = React.useState(true);
@@ -37,7 +36,7 @@ export function Home() {
     try {
       const response = await fetchUser();
       if (response.status !== 200) {
-        navigation.navigate(SCREEN_SETTINGS);
+        navigation.navigate('settings');
         return;
       }
     } catch (err) {}
@@ -59,7 +58,7 @@ export function Home() {
       </Pane>
       {!appInitialized && (
         <Container>
-          <LinkButton mode="contained" to={`/${SCREEN_SETTINGS}`}>
+          <LinkButton mode="contained" to="settings">
             Configure
           </LinkButton>
         </Container>
@@ -82,9 +81,6 @@ export function HomeHeader() {
   const navigation = useNavigation();
 
   return (
-    <Appbar.Action
-      icon="cog"
-      onPress={() => navigation.navigate(SCREEN_SETTINGS)}
-    />
+    <Appbar.Action icon="cog" onPress={() => navigation.navigate('settings')} />
   );
 }
