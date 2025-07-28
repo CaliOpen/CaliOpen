@@ -1,3 +1,4 @@
+import './modules/setup.ts';
 import * as React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Provider as PaperProvider } from 'react-native-paper';
@@ -10,6 +11,7 @@ import { Home } from './screens/Home';
 import { Settings } from './screens/Settings';
 import { theme } from './modules/ui';
 import { RootStackParamList } from './modules/routes';
+import { SCREEN_HOME, SCREEN_SETTINGS } from './screens/consts';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -18,7 +20,7 @@ export default function App() {
     <PaperProvider theme={theme}>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="home"
+          initialRouteName={SCREEN_HOME}
           screenOptions={{
             headerMode: 'screen',
             title: 'Caliopen',
@@ -28,8 +30,8 @@ export default function App() {
             },
           }}
         >
-          <Stack.Screen name="home" component={Home} />
-          <Stack.Screen name="settings" component={Settings} />
+          <Stack.Screen name={SCREEN_HOME} component={Home} />
+          <Stack.Screen name={SCREEN_SETTINGS} component={Settings} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

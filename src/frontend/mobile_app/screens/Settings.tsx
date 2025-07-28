@@ -13,9 +13,19 @@ import {
   resetAll,
   SettingsPayload,
   SETTING_KEYS,
+  SettingKey,
 } from '../modules/settings';
+import { authenticate } from '../modules/auth';
+import { AppError } from '../modules/errors';
+import { getUser } from '../modules/api';
 
 const defaultInstance = 'https://www.caliopen.app';
+
+const DEFAULT_SETTINGS: SettingsPayload = {
+  instance: defaultInstance,
+  username: '',
+  password: '',
+};
 function validate(settings: SettingsPayload) {
   let isValid = true;
 
@@ -34,28 +44,27 @@ type Props = NativeStackScreenProps<RootStackParamList, 'settings'>;
 
 export function Settings({ navigation }: Props) {
   const theme = useTheme();
-  const [nextInstance, setInstance] = React.useState('');
-  const [nextLogin, setLogin] = React.useState('');
-  const [nextPass, setPass] = React.useState('');
+  const [nextSettings, setSettings] =
+    React.useState<SettingsPayload>(DEFAULT_SETTINGS);
   const [loading, setLoading] = React.useState(false);
   const [loadingReset, setLoadingReset] = React.useState(false);
+  const [error, setError] = React.useState<undefined | string>();
 
-  const { isValid } = validate({
-    instance: nextInstance,
-    login: nextLogin,
-    password: nextPass,
-  });
+  const { isValid } = validate(nextSettings);
 
   /**
    * load settings
    */
   const init = async () => {
     try {
-      const { instance, login, password } = await getSettings();
+      const { instance, username, password } = await getSettings();
+      console.log({ instance, username, password });
 
-      setInstance(instance || defaultInstance);
-      setLogin(login || '');
-      setPass(password || '');
+      setSettings({
+        instance: instance || DEFAULT_SETTINGS.instance,
+        username: username || DEFAULT_SETTINGS.username,
+        password: password || DEFAULT_SETTINGS.password,
+      });
     } catch (e) {
       console.warn(e);
     }
@@ -104,23 +113,23 @@ export function Settings({ navigation }: Props) {
         </Text>
         <TextInput
           label="Instance"
-          value={nextInstance}
-          onChangeText={setInstance}
+          value={nextSettings.instance}
+          onChangeText={(value) => handleChange('instance', value)}
           style={styles.settingItem}
           placeholder={defaultInstance}
         />
         <TextInput
-          label="Login"
-          value={nextLogin}
-          onChangeText={setLogin}
+          label="Username"
+          value={nextSettings.username}
+          onChangeText={(value) => handleChange('username', value)}
           style={styles.settingItem}
         />
         <TextInput
           label="Password"
-          value={nextPass}
+          value={nextSettings.password}
           secureTextEntry
           textContentType="password"
-          onChangeText={setPass}
+          onChangeText={(value) => handleChange('password', value)}
           style={styles.settingItem}
         />
         <Button
@@ -136,10 +145,11 @@ export function Settings({ navigation }: Props) {
           onPress={handleReset}
           mode="outlined"
           loading={loadingReset}
-          style={{ borderColor: theme.colors.error }}
+          style={{ ...styles.settingItem, borderColor: theme.colors.error }}
         >
           <Text style={{ color: theme.colors.error }}>Reset</Text>
         </Button>
+        {error && <Text style={{ color: theme.colors.error }}>{error}</Text>}
       </Container>
     </Pane>
   );
