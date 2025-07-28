@@ -5,6 +5,7 @@ import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Home } from './screens/Home';
+import { Settings } from './screens/Settings';
 import { theme } from './modules/ui';
 
 const Stack = createNativeStackNavigator();
@@ -25,6 +26,7 @@ export default function App() {
           }}
         >
           <Stack.Screen name="home" component={Home} />
+          <Stack.Screen name="settings" component={Settings} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>
