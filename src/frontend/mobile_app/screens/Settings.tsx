@@ -17,9 +17,10 @@ import {
 } from '../modules/settings';
 import { authenticate } from '../modules/auth';
 import { AppError } from '../modules/errors';
-import { getUser } from '../modules/api';
 
-const defaultInstance = 'https://www.caliopen.app';
+// XXX: for dev purposes
+const defaultInstance = 'http://10.0.2.2:31415';
+// const defaultInstance = 'https://www.caliopen.app';
 
 const DEFAULT_SETTINGS: SettingsPayload = {
   instance: defaultInstance,
@@ -58,7 +59,6 @@ export function Settings({ navigation }: Props) {
   const init = async () => {
     try {
       const { instance, username, password } = await getSettings();
-      console.log({ instance, username, password });
 
       setSettings({
         instance: instance || DEFAULT_SETTINGS.instance,
@@ -75,26 +75,48 @@ export function Settings({ navigation }: Props) {
   }, []);
 
   const handleSave = async () => {
-    if (!nextInstance || !nextLogin || !nextPass) {
+    if (SETTING_KEYS.some((key) => nextSettings[key].length === 0)) {
       return;
     }
     setLoading(true);
     try {
-      await saveSettings({
-        instance: nextInstance,
-        login: nextLogin,
-        password: nextPass,
-      });
+      await saveSettings(nextSettings);
+    } catch (e) {
+      if (e instanceof AppError) {
+        setError(e.toString());
+      } else {
+        console.warn(e);
+      }
+      setLoading(false);
+      return;
+    }
+
+    try {
+      await authenticate();
       setLoading(false);
       navigation.goBack();
     } catch (e) {
-      console.warn(e);
+      if (e instanceof AppError) {
+        setError(e.toString());
+      } else {
+        console.warn(e);
+      }
       setLoading(false);
     }
   };
 
+  const handleChange = (name: SettingKey, value: string) => {
+    setSettings((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    setError(undefined);
+  };
+
   const handleReset = async () => {
     setLoadingReset(true);
+    setError(undefined);
     try {
       await resetAll();
       await init();
