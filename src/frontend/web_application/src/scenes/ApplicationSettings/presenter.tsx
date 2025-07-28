@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Trans } from '@lingui/react';
+import { I18n } from '@lingui/core';
 import { Section, PageTitle, Button, FieldErrors } from '../../components';
 import InterfaceSettings from './components/InterfaceSettings';
 import MessageSettings from './components/MessageSettings';
@@ -9,7 +10,16 @@ import NotificationSettings from './components/NotificationSettings';
 import DesktopNotificationSettings from './components/DesktopNotificationSettings';
 import './style.scss';
 
-class ApplicationSettings extends PureComponent {
+interface Props {
+  handleSubmit: (any) => any;
+  requestSettings: () => void;
+  notifyError: (any) => void;
+  notifySuccess: (any) => void;
+  errors: Record<string, any>;
+  i18n: I18n;
+}
+
+class ApplicationSettings extends PureComponent<Props> {
   static propTypes = {
     handleSubmit: PropTypes.func.isRequired,
     requestSettings: PropTypes.func.isRequired,
@@ -34,9 +44,13 @@ class ApplicationSettings extends PureComponent {
     await requestSettings();
 
     return notifySuccess({
-      message: i18n._(/* i18n */ 'settings.form.feedback.successfull', null, {
-        message: 'Settings successfully updated!',
-      }),
+      message: i18n._(
+        /* i18n */ 'settings.form.feedback.successfull',
+        undefined,
+        {
+          message: 'Settings successfully updated!',
+        }
+      ),
     });
   };
 
@@ -45,7 +59,7 @@ class ApplicationSettings extends PureComponent {
     notifyError({
       message: i18n._(
         /* i18n */ 'settings.form.feedback.unexpected-error',
-        null,
+        undefined,
         {
           message: 'Error when updating settings.',
         }
@@ -69,7 +83,7 @@ class ApplicationSettings extends PureComponent {
         )}
         <div className="s-application-settings__col-sections">
           <Section
-            title={i18n._(/* i18n */ 'settings.interface.title', null, {
+            title={i18n._(/* i18n */ 'settings.interface.title', undefined, {
               message: 'Customize your interface',
             })}
           >
@@ -78,7 +92,7 @@ class ApplicationSettings extends PureComponent {
         </div>
         <div className="s-application-settings__col-sections">
           <Section
-            title={i18n._(/* i18n */ 'settings.message.title', null, {
+            title={i18n._(/* i18n */ 'settings.message.title', undefined, {
               message: 'Messages settings',
             })}
           >
@@ -88,7 +102,7 @@ class ApplicationSettings extends PureComponent {
         <div className="s-application-settings__col-sections">
           <Section
             className="s-application-settings__section"
-            title={i18n._(/* i18n */ 'settings.contact.title', null, {
+            title={i18n._(/* i18n */ 'settings.contact.title', undefined, {
               message: 'Contact settings',
             })}
           >
@@ -97,7 +111,7 @@ class ApplicationSettings extends PureComponent {
         </div>
         <div className="s-application-settings__col-sections">
           <Section
-            title={i18n._(/* i18n */ 'settings.notification.title', null, {
+            title={i18n._(/* i18n */ 'settings.notification.title', undefined, {
               message: 'Notifications settings',
             })}
           >
@@ -106,7 +120,7 @@ class ApplicationSettings extends PureComponent {
           <Section
             title={i18n._(
               /* i18n */ 'settings.desktop_notification.title',
-              null,
+              undefined,
               {
                 message: 'Desktop notifications settings',
               }
