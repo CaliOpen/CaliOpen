@@ -1,0 +1,22 @@
+{
+  "name": "@caliopen/core",
+  "version": "1.0.0",
+  "packageManager": "yarn@3.5.1",
+  "main": "index.ts",
+  "peerDependencies": {
+    "axios": "*",
+    "base64-js": "*",
+    "elliptic": "*",
+    "jssha": "*",
+    "uuid": "*"
+  },
+  "devDependencies": {
+    "@types/elliptic": "^6.4.14",
+    "@types/uuid": "^9.0.3",
+    "axios": "^1.5.0",
+    "base64-js": "^1.5.1",
+    "elliptic": "^6.5.4",
+    "jssha": "^3.3.1",
+    "uuid": "^9.0.0"
+  }
+}
