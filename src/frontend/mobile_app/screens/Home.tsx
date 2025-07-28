@@ -1,34 +1,20 @@
 import * as React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
+import { Appbar, useTheme } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { Container } from '../components/Container';
 import { LinkButton } from '../components/LinkButton';
 import { Pane } from '../components/Pane';
-import { getBearer, getSettings } from '../modules/settings';
+import { getBearer } from '../modules/settings';
 import { fetchUser } from '../modules/api';
 import { SCREEN_SETTINGS } from './consts';
 
-export function Home() {
-  const theme = useTheme();
-  const navigation = useNavigation();
-
+const useAppInitialized = () => {
   const [appInitialized, setAppInitialized] = React.useState(true);
-  const [syncLoading, setSyncLoading] = React.useState(false);
 
   const init = async () => {
     try {
       const bearer = await getBearer();
-
-      if (bearer) {
-        try {
-          const response = await fetchUser();
-          if (response.status !== 200) {
-            navigation.navigate(SCREEN_SETTINGS);
-            return;
-          }
-        } catch (err) {}
-      }
       setAppInitialized(bearer ? true : false);
     } catch (e) {
       console.warn(e);
@@ -38,6 +24,30 @@ export function Home() {
   React.useEffect(() => {
     init();
   }, []);
+
+  return appInitialized;
+};
+
+export function Home() {
+  const navigation = useNavigation();
+  const [syncLoading, setSyncLoading] = React.useState(false);
+  const appInitialized = useAppInitialized();
+
+  const testAuth = async () => {
+    try {
+      const response = await fetchUser();
+      if (response.status !== 200) {
+        navigation.navigate(SCREEN_SETTINGS);
+        return;
+      }
+    } catch (err) {}
+  };
+
+  React.useEffect(() => {
+    if (appInitialized) {
+      testAuth();
+    }
+  }, [appInitialized]);
 
   return (
     <>
@@ -49,7 +59,7 @@ export function Home() {
       </Pane>
       {!appInitialized && (
         <Container>
-          <LinkButton mode="contained" to="/settings">
+          <LinkButton mode="contained" to={`/${SCREEN_SETTINGS}`}>
             Configure
           </LinkButton>
         </Container>
@@ -65,5 +75,16 @@ export function Home() {
         </View>
       )}
     </>
+  );
+}
+
+export function HomeHeader() {
+  const navigation = useNavigation();
+
+  return (
+    <Appbar.Action
+      icon="cog"
+      onPress={() => navigation.navigate(SCREEN_SETTINGS)}
+    />
   );
 }

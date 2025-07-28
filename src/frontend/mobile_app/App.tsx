@@ -7,7 +7,7 @@ import {
   createNativeStackNavigator,
   NativeStackNavigationProp,
 } from '@react-navigation/native-stack';
-import { Home } from './screens/Home';
+import { Home, HomeHeader } from './screens/Home';
 import { Settings } from './screens/Settings';
 import { theme } from './modules/ui';
 import { RootStackParamList } from './modules/routes';
@@ -28,9 +28,14 @@ export default function App() {
             headerStyle: {
               backgroundColor: theme.colors.primary,
             },
+            headerRightColor: theme.colors.onPrimary,
           }}
         >
-          <Stack.Screen name={SCREEN_HOME} component={Home} />
+          <Stack.Screen
+            name={SCREEN_HOME}
+            component={Home}
+            options={{ headerRight: HomeHeader }}
+          />
           <Stack.Screen name={SCREEN_SETTINGS} component={Settings} />
         </Stack.Navigator>
         <StatusBar style="auto" />
