@@ -9,6 +9,7 @@ import { getBearer } from '../modules/settings';
 import { fetchUser } from '../modules/api';
 import { Sync } from '../modules/sync/components/Sync';
 import { BottomAppBar } from '../components/BottomAppBar';
+import { useEvents } from '../modules/events/hooks/useEvents';
 
 const useAppInitialized = () => {
   const [appInitialized, setAppInitialized] = React.useState(true);
@@ -31,8 +32,8 @@ const useAppInitialized = () => {
 
 export function Home() {
   const navigation = useNavigation();
-  const [syncLoading, setSyncLoading] = React.useState(false);
   const appInitialized = useAppInitialized();
+  const [events, pushEvent] = useEvents();
 
   const testAuth = async () => {
     try {
@@ -56,7 +57,7 @@ export function Home() {
         <Container>
           <Text>Sync your SMS with Caliopen</Text>
         </Container>
-        {syncLoading && <Text>Loading…</Text>}
+        {events}
       </Pane>
       <BottomAppBar>
         {!appInitialized && (
@@ -68,7 +69,7 @@ export function Home() {
         )}
         {appInitialized && (
           <Container>
-            <Sync />
+            <Sync pushEvent={pushEvent} />
           </Container>
         )}
       </BottomAppBar>

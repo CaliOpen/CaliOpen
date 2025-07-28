@@ -12,6 +12,7 @@ export type SettingKey = keyof SettingsPayload;
 // XXX: should we store only instance, username & computed bearer?
 export const SETTING_KEYS: SettingKey[] = ['instance', 'username', 'password'];
 const SETTING_BEARER = 'bearer';
+const SETTING_LAST_SYNC = 'last-sync';
 
 export async function resetAll() {
   await Promise.all(
@@ -57,4 +58,16 @@ export const setBearer = async (token: string) => {
 
 export const getBearer = async (): Promise<null | string> => {
   return SecureStore.getItemAsync(SETTING_BEARER);
+};
+
+export const setLastSync = async (lastSync: number) => {
+  await SecureStore.setItemAsync(SETTING_LAST_SYNC, lastSync.toString());
+};
+
+export const getLastSync = async (): Promise<null | number> => {
+  const value = await SecureStore.getItemAsync(SETTING_LAST_SYNC);
+  if (value) {
+    return Number.parseInt(value, 10);
+  }
+  return null;
 };
